@@ -1,0 +1,6 @@
+{
+  "manifest_version": 3,
+  "name": "Foldr",
+  "description": "a reader browser extension app",
+  "version": "1.0.0"
+}
