@@ -1,19 +1,55 @@
+const CopyPlugin = require('copy-webpack-plugin')
+const HtmlPlugin = require('html-webpack-plugin')
+const path = require('path')
+const tailwindcss = require('tailwindcss');
+const autoprefixer = require('autoprefixer')
+
 module.exports = {
   mode: "development",
-  entry: "./src/test.tsx",
+  devtool: "cheap-module-source-map",
+  entry: {
+    popup: path.resolve('./src/popup/popup.tsx'),
+  },
   module: {
     rules: [
       {
         use: "ts-loader",
         test: /\.tsx$/,
         exclude: /node_modules/
+      },
+      {
+        use: ["style-loader", "css-loader", {
+          loader: 'postcss-loader',
+          options: {
+            postcssOptions: {
+              ident: 'postcss',
+              plugins: [tailwindcss, autoprefixer],
+            },
+          }
+        }],
+        test: /\.css$/i,
       }
     ]
   },
+  plugins: [
+    new CopyPlugin({
+      patterns: [
+        {
+          from: path.resolve('src/static'),
+          to: path.resolve('dist')
+        }
+      ]
+    }),
+    new HtmlPlugin({
+      title: 'ReactJS Boilerplate',
+      filename: 'popup.html',
+      chunks: ['popup']
+    })
+  ],
   resolve: {
     extensions: ['.tsx', '.ts', '.js']
   },
   output: {
-    filename: 'index.js'
+    filename: '[name].js'
   }
 }
