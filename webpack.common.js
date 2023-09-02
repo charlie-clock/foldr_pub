@@ -5,10 +5,10 @@ const tailwindcss = require('tailwindcss');
 const autoprefixer = require('autoprefixer')
 
 module.exports = {
-  mode: "development",
-  devtool: "cheap-module-source-map",
   entry: {
     popup: path.resolve('./src/popup/popup.tsx'),
+    options: path.resolve('./src/options/options.tsx'),
+    contentScript: path.resolve('./src/contentScript/contentScript.ts')
   },
   module: {
     rules: [
@@ -32,6 +32,7 @@ module.exports = {
     ]
   },
   plugins: [
+    // this copy plugin copies manifest.json file into the dist
     new CopyPlugin({
       patterns: [
         {
@@ -40,16 +41,26 @@ module.exports = {
         }
       ]
     }),
-    new HtmlPlugin({
-      title: 'ReactJS Boilerplate',
-      filename: 'popup.html',
-      chunks: ['popup']
-    })
+    ...getHtmlPlugins(
+      [
+        'popup',
+        'options'
+    ]
+    )
   ],
   resolve: {
     extensions: ['.tsx', '.ts', '.js']
   },
   output: {
-    filename: '[name].js'
+    filename: '[name].js',
+    path: path.join(__dirname, 'dist')
   }
+}
+
+function getHtmlPlugins(chunks) {
+  return chunks.map(chunk => new HtmlPlugin({
+    title: 'React Extension',
+    filename: `${chunk}.html`,
+    chunks: [chunk]
+  }))
 }
